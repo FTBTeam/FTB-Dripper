@@ -1,0 +1,27 @@
+modLoader = "javafml"
+loaderVersion = "[36,)"
+issueTrackerURL = "https://github.com/FTBTeam/FTB-Dripper/issues"
+license = "All Rights Reserved"
+
+[[mods]]
+modId = "ftbdripper"
+version = "${version}"
+displayName = "FTB Dripper"
+authors = "LatvianModder"
+description = '''
+Adds Dripper. Nothing else.
+'''
+
+[[dependencies.ftbdripper]]
+modId = "forge"
+mandatory = true
+versionRange = "[36,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.ftbdripper]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.16.5,)"
+ordering = "NONE"
+side = "BOTH"
