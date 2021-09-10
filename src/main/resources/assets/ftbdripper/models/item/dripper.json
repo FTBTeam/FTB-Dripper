@@ -1,3 +1,6 @@
 {
-	"parent": "ftbdripper:block/dripper"
+	"parent": "minecraft:item/generated",
+	"textures": {
+		"layer0": "ftbdripper:item/dripper"
+	}
 }

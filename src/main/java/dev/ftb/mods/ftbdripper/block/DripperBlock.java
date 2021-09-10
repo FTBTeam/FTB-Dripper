@@ -2,7 +2,6 @@ package dev.ftb.mods.ftbdripper.block;
 
 
 import dev.ftb.mods.ftbdripper.block.entity.DripperBlockEntity;
-import dev.ftb.mods.ftbdripper.item.FTBDripperItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.TextComponent;
@@ -10,8 +9,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -20,7 +17,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -28,11 +24,8 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 import java.util.Random;
 
@@ -85,21 +78,7 @@ public class DripperBlock extends Block {
 
 			if (blockEntity instanceof DripperBlockEntity) {
 				FluidTank tank = ((DripperBlockEntity) blockEntity).tank;
-				ItemStack heldItem = player.getItemInHand(hand);
-
-				if (heldItem.getItem() == Items.POTION) {
-					if (tank.fill(new FluidStack(Fluids.WATER, 300), IFluidHandler.FluidAction.EXECUTE) > 0) {
-						heldItem.shrink(1);
-						ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(Items.GLASS_BOTTLE), player.inventory.selected);
-					}
-				} else if (heldItem.getItem() == FTBDripperItems.WATER_BOWL.get()) {
-					if (tank.fill(new FluidStack(Fluids.WATER, 250), IFluidHandler.FluidAction.EXECUTE) > 0) {
-						heldItem.shrink(1);
-						ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(Items.BOWL), player.inventory.selected);
-					}
-				} else if (!heldItem.isEmpty()) {
-					FluidUtil.interactWithFluidHandler(player, hand, tank);
-				}
+				FluidUtil.interactWithFluidHandler(player, hand, tank);
 
 				if (tank.getFluidAmount() == 0) {
 					player.displayClientMessage(new TextComponent("Empty"), true);
