@@ -151,8 +151,6 @@ if (ENV.CURSEFORGE_KEY) {
 			releaseType = project.curseforge_type
 			addGameVersion "1.16.5"
 			mainArtifact(remapJar.archivePath)
-			relations {
-			}
 			changelog = getGitChangelog
 			changelogType = 'markdown'
 		}
