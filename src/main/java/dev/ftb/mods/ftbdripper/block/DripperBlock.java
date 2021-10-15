@@ -100,6 +100,7 @@ public class DripperBlock extends Block {
 	public void animateTick(BlockState state, Level level, BlockPos pos, Random rand) {
 		if (state.getValue(ACTIVE)) {
 			BlockEntity entity = level.getBlockEntity(pos);
+			boolean foundParticle = false;
 
 			if (entity instanceof DripperBlockEntity && !((DripperBlockEntity) entity).tank.isEmpty()) {
 				Fluid fluid = ((DripperBlockEntity) entity).tank.getFluid().getFluid();
@@ -109,8 +110,13 @@ public class DripperBlock extends Block {
 
 					if (s.getBlock() != Blocks.AIR) {
 						level.addParticle(new BlockParticleOption(ParticleTypes.BLOCK, s), pos.getX() + 0.5D, pos.getY() + 0.475D, pos.getZ() + 0.5D, 0D, -1D, 0D);
+						foundParticle = true;
 					}
 				}
+			}
+
+			if (!foundParticle) {
+				level.addParticle(ParticleTypes.DRIPPING_WATER, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, 0D, 0D, 0D);
 			}
 		}
 	}
