@@ -8,8 +8,11 @@ import dev.ftb.mods.ftbdripper.recipe.NoInventory;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
@@ -28,6 +31,7 @@ public class DripperBlockEntity extends BlockEntity {
 	public final FluidTank tank;
 	private final LazyOptional<IFluidHandler> fluidCap;
 	private int prevAmount = -1;
+	private Fluid prevFluid = null;
 
 	public DripperBlockEntity() {
 		super(FTBDripperBlockEntities.DRIPPER.get());
@@ -40,16 +44,46 @@ public class DripperBlockEntity extends BlockEntity {
 		fluidCap = LazyOptional.of(() -> tank);
 	}
 
+	public void writeData(CompoundTag tag) {
+		tag.put("Tank", tank.writeToNBT(new CompoundTag()));
+	}
+
+	public void readData(CompoundTag tag) {
+		tank.readFromNBT(tag.getCompound("Tank"));
+	}
+
 	@Override
 	public CompoundTag save(CompoundTag tag) {
-		tag.put("Tank", tank.writeToNBT(new CompoundTag()));
+		writeData(tag);
 		return super.save(tag);
 	}
 
 	@Override
 	public void load(BlockState state, CompoundTag tag) {
 		super.load(state, tag);
-		tank.readFromNBT(tag.getCompound("Tank"));
+		readData(tag);
+	}
+
+	@Override
+	public CompoundTag getUpdateTag() {
+		return save(new CompoundTag());
+	}
+
+	@Override
+	public void handleUpdateTag(BlockState state, CompoundTag tag) {
+		load(state, tag);
+	}
+
+	@Override
+	public ClientboundBlockEntityDataPacket getUpdatePacket() {
+		CompoundTag nbt = new CompoundTag();
+		writeData(nbt);
+		return new ClientboundBlockEntityDataPacket(worldPosition, 0, nbt);
+	}
+
+	@Override
+	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet) {
+		readData(packet.getTag());
 	}
 
 	@NotNull
@@ -68,6 +102,11 @@ public class DripperBlockEntity extends BlockEntity {
 		if (!level.isClientSide() && prevAmount != tank.getFluidAmount()) {
 			prevAmount = tank.getFluidAmount();
 			level.setBlock(worldPosition, getBlockState().setValue(DripperBlock.ACTIVE, prevAmount > 0), 3);
+		}
+
+		if (!level.isClientSide() && prevFluid != tank.getFluid().getFluid()) {
+			prevFluid = tank.getFluid().getFluid();
+			level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 11);
 		}
 	}
 

@@ -3,6 +3,7 @@ package dev.ftb.mods.ftbdripper.block;
 
 import dev.ftb.mods.ftbdripper.block.entity.DripperBlockEntity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerLevel;
@@ -12,11 +13,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -95,7 +99,19 @@ public class DripperBlock extends Block {
 	@OnlyIn(Dist.CLIENT)
 	public void animateTick(BlockState state, Level level, BlockPos pos, Random rand) {
 		if (state.getValue(ACTIVE)) {
-			level.addParticle(ParticleTypes.DRIPPING_WATER, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, 0D, 0D, 0D);
+			BlockEntity entity = level.getBlockEntity(pos);
+
+			if (entity instanceof DripperBlockEntity && !((DripperBlockEntity) entity).tank.isEmpty()) {
+				Fluid fluid = ((DripperBlockEntity) entity).tank.getFluid().getFluid();
+
+				if (fluid != Fluids.EMPTY) {
+					BlockState s = fluid.defaultFluidState().createLegacyBlock();
+
+					if (s.getBlock() != Blocks.AIR) {
+						level.addParticle(new BlockParticleOption(ParticleTypes.BLOCK, s), pos.getX() + 0.5D, pos.getY() + 0.475D, pos.getZ() + 0.5D, 0D, -1D, 0D);
+					}
+				}
+			}
 		}
 	}
 
