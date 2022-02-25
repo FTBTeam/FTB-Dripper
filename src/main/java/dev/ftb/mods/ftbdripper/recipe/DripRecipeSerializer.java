@@ -23,7 +23,7 @@ public class DripRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?>
 
 		if (json.has("inputItem")) {
 			if (json.get("inputItem").isJsonObject()) {
-				r.inputItem = ShapedRecipe.itemFromJson(json.get("inputItem").getAsJsonObject());
+				r.inputItem = ShapedRecipe.itemStackFromJson(json.get("inputItem").getAsJsonObject());
 			} else {
 				r.inputItem = new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation(json.get("inputItem").getAsString())));
 			}
@@ -35,7 +35,7 @@ public class DripRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?>
 
 		if (json.has("outputItem")) {
 			if (json.get("outputItem").isJsonObject()) {
-				r.outputItem = ShapedRecipe.itemFromJson(json.get("outputItem").getAsJsonObject());
+				r.outputItem = ShapedRecipe.itemStackFromJson(json.get("outputItem").getAsJsonObject());
 			} else {
 				r.outputItem = new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation(json.get("outputItem").getAsString())));
 			}

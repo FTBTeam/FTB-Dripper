@@ -14,6 +14,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -30,13 +31,14 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 
 /**
  * @author LatvianModder
  */
-public class DripperBlock extends Block {
+public class DripperBlock extends Block implements EntityBlock {
 	public static final VoxelShape SHAPE = Shapes.or(
 			Block.box(7, 8, 7, 9, 9, 9),
 			Block.box(0, 13, 0, 16, 16, 16),
@@ -53,14 +55,10 @@ public class DripperBlock extends Block {
 		registerDefaultState(getStateDefinition().any().setValue(ACTIVE, false));
 	}
 
+	@Nullable
 	@Override
-	public boolean hasTileEntity(BlockState state) {
-		return true;
-	}
-
-	@Override
-	public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
-		return new DripperBlockEntity();
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+		return new DripperBlockEntity(pos, state);
 	}
 
 	@Override

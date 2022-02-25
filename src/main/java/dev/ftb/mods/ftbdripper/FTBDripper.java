@@ -44,7 +44,7 @@ public class FTBDripper {
 			if (!event.getWorld().isClientSide()) {
 				ItemStack stack = new ItemStack(FTBDripperItems.WATER_BOWL.get());
 				stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).orElse(null).fill(new FluidStack(Fluids.WATER, FluidAttributes.BUCKET_VOLUME / 4), IFluidHandler.FluidAction.EXECUTE);
-				ItemHandlerHelper.giveItemToPlayer(event.getPlayer(), stack, event.getPlayer().inventory.selected);
+				ItemHandlerHelper.giveItemToPlayer(event.getPlayer(), stack, event.getPlayer().getInventory().selected);
 			}
 
 			event.getPlayer().swing(event.getHand());

@@ -33,8 +33,8 @@ public class DripperBlockEntity extends BlockEntity {
 	private int prevAmount = -1;
 	private Fluid prevFluid = null;
 
-	public DripperBlockEntity() {
-		super(FTBDripperBlockEntities.DRIPPER.get());
+	public DripperBlockEntity(BlockPos pos, BlockState state) {
+		super(FTBDripperBlockEntities.DRIPPER.get(), pos, state);
 		tank = new FluidTank(4000) {
 			@Override
 			protected void onContentsChanged() {
@@ -59,8 +59,8 @@ public class DripperBlockEntity extends BlockEntity {
 	}
 
 	@Override
-	public void load(BlockState state, CompoundTag tag) {
-		super.load(state, tag);
+	public void load(CompoundTag tag) {
+		super.load(tag);
 		readData(tag);
 	}
 
@@ -70,15 +70,15 @@ public class DripperBlockEntity extends BlockEntity {
 	}
 
 	@Override
-	public void handleUpdateTag(BlockState state, CompoundTag tag) {
-		load(state, tag);
+	public void handleUpdateTag(CompoundTag tag) {
+		load(tag);
 	}
 
 	@Override
 	public ClientboundBlockEntityDataPacket getUpdatePacket() {
 		CompoundTag nbt = new CompoundTag();
 		writeData(nbt);
-		return new ClientboundBlockEntityDataPacket(worldPosition, 0, nbt);
+		return ClientboundBlockEntityDataPacket.create(this);
 	}
 
 	@Override
