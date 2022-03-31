@@ -53,9 +53,8 @@ public class DripperBlockEntity extends BlockEntity {
 	}
 
 	@Override
-	public CompoundTag save(CompoundTag tag) {
+	protected void saveAdditional(CompoundTag tag) {
 		writeData(tag);
-		return super.save(tag);
 	}
 
 	@Override
@@ -66,7 +65,7 @@ public class DripperBlockEntity extends BlockEntity {
 
 	@Override
 	public CompoundTag getUpdateTag() {
-		return save(new CompoundTag());
+		return saveWithFullMetadata();
 	}
 
 	@Override
