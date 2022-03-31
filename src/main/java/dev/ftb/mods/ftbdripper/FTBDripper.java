@@ -6,9 +6,11 @@ import dev.ftb.mods.ftbdripper.item.FTBDripperItems;
 import dev.ftb.mods.ftbdripper.item.WaterBowlItem;
 import dev.ftb.mods.ftbdripper.recipe.FTBDripperRecipeSerializers;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fluids.FluidAttributes;
@@ -33,6 +35,10 @@ public class FTBDripper {
 		FTBDripperBlocks.REGISTRY.register(FMLJavaModLoadingContext.get().getModEventBus());
 		FTBDripperItems.REGISTRY.register(FMLJavaModLoadingContext.get().getModEventBus());
 		FTBDripperBlockEntities.REGISTRY.register(FMLJavaModLoadingContext.get().getModEventBus());
+	}
+
+	@SubscribeEvent
+	public static void itemRegister(RegistryEvent<Item> event) {
 		FTBDripperRecipeSerializers.REGISTRY.register(FMLJavaModLoadingContext.get().getModEventBus());
 	}
 

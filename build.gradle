@@ -1,5 +1,5 @@
 plugins {
-	id "dev.architectury.loom" version "0.10.0-SNAPSHOT"
+	id "dev.architectury.loom" version "0.11.0-SNAPSHOT"
 	id 'maven-publish'
 	id "com.matthewprenger.cursegradle" version "1.4.0"
 }
@@ -61,7 +61,7 @@ repositories {
 
 dependencies {
 	minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
-	mappings minecraft.officialMojangMappings()
+	mappings loom.officialMojangMappings()
 	forge "net.minecraftforge:forge:${rootProject.minecraft_version}-${rootProject.forge_version}"
 	modApi("dev.architectury:architectury-forge:${rootProject.architectury_version}")
 
