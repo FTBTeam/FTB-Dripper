@@ -142,6 +142,6 @@ public class DripRecipe implements Recipe<NoInventory> {
 
 	@Override
 	public RecipeType<?> getType() {
-		return FTBDripperRecipeSerializers.DRIP_TYPE;
+		return FTBDripperRecipeSerializers.DRIP_TYPE.get();
 	}
 }
