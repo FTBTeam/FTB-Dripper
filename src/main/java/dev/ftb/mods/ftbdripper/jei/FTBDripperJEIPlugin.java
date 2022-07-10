@@ -40,7 +40,7 @@ public class FTBDripperJEIPlugin implements IModPlugin {
 	@Override
 	public void registerRecipes(IRecipeRegistration r) {
 		Level level = Minecraft.getInstance().level;
-		r.addRecipes(level.getRecipeManager().getRecipesFor(FTBDripperRecipeSerializers.DRIP_TYPE, NoInventory.INSTANCE, level), DripperCategory.UID);
+		r.addRecipes(level.getRecipeManager().getRecipesFor(FTBDripperRecipeSerializers.DRIP_TYPE.get(), NoInventory.INSTANCE, level), DripperCategory.UID);
 	}
 
 	@Override

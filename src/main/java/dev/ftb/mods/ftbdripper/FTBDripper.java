@@ -35,11 +35,8 @@ public class FTBDripper {
 		FTBDripperBlocks.REGISTRY.register(FMLJavaModLoadingContext.get().getModEventBus());
 		FTBDripperItems.REGISTRY.register(FMLJavaModLoadingContext.get().getModEventBus());
 		FTBDripperBlockEntities.REGISTRY.register(FMLJavaModLoadingContext.get().getModEventBus());
-	}
-
-	@SubscribeEvent
-	public static void itemRegister(RegistryEvent<Item> event) {
 		FTBDripperRecipeSerializers.REGISTRY.register(FMLJavaModLoadingContext.get().getModEventBus());
+		FTBDripperRecipeSerializers.REGISTRY_RECIPE_TYPE.register(FMLJavaModLoadingContext.get().getModEventBus());
 	}
 
 	@SubscribeEvent

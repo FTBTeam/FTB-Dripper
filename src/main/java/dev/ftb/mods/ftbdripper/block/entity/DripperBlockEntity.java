@@ -113,7 +113,7 @@ public class DripperBlockEntity extends BlockEntity {
 		if (!tank.isEmpty()) {
 			FluidStack fluid = tank.drain(FTBDripper.consumedFluid, IFluidHandler.FluidAction.EXECUTE);
 
-			for (DripRecipe recipe : level.getRecipeManager().getRecipesFor(FTBDripperRecipeSerializers.DRIP_TYPE, NoInventory.INSTANCE, level)) {
+			for (DripRecipe recipe : level.getRecipeManager().getRecipesFor(FTBDripperRecipeSerializers.DRIP_TYPE.get(), NoInventory.INSTANCE, level)) {
 				if (recipe.fluid == fluid.getFluid() && recipe.testInput(blockBelow)) {
 					if (random.nextDouble() < recipe.chance) {
 						level.setBlock(posBelow, recipe.output, 3);
