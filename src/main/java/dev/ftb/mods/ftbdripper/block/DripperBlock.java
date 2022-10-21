@@ -128,7 +128,7 @@ public class DripperBlock extends Block implements EntityBlock {
 		do {
 			posBelow = posBelow.below();
 
-			if (posBelow.getY() == 0) {
+			if (posBelow.getY() == level.getMinBuildHeight()) {
 				return;
 			}
 
@@ -137,7 +137,6 @@ public class DripperBlock extends Block implements EntityBlock {
 		while (blockBelow.isAir());
 
 		BlockEntity blockEntity = level.getBlockEntity(pos);
-
 		if (blockEntity instanceof DripperBlockEntity) {
 			((DripperBlockEntity) blockEntity).tick(state, posBelow, blockBelow, random);
 		}
