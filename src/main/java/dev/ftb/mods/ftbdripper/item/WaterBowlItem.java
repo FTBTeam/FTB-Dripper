@@ -9,13 +9,14 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.fluids.FluidAttributes;
+import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fluids.capability.templates.FluidHandlerItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,7 +26,7 @@ public class WaterBowlItem extends Item {
 	}
 
 	public static boolean fillBowl(Level level, Player player, InteractionHand hand) {
-		BlockHitResult hit = getPlayerPOVHitResult(level, player, net.minecraft.world.level.ClipContext.Fluid.SOURCE_ONLY);
+		BlockHitResult hit = getPlayerPOVHitResult(level, player, ClipContext.Fluid.SOURCE_ONLY);
 
 		if (hit.getType() != HitResult.Type.BLOCK) {
 			return false;
@@ -44,6 +45,6 @@ public class WaterBowlItem extends Item {
 
 	@Override
 	public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
-		return new FluidHandlerItemStack.SwapEmpty(stack, new ItemStack(Items.BOWL), FluidAttributes.BUCKET_VOLUME / 4);
+		return new FluidHandlerItemStack.SwapEmpty(stack, new ItemStack(Items.BOWL), FluidType.BUCKET_VOLUME / 4);
 	}
 }

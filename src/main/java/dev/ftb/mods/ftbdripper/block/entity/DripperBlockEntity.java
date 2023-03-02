@@ -10,25 +10,25 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Random;
-
 /**
  * @author LatvianModder
  */
 public class DripperBlockEntity extends BlockEntity {
-	public final FluidTank tank;
+	private final FluidTank tank;
 	private final LazyOptional<IFluidHandler> fluidCap;
 	private int prevAmount = -1;
 	private Fluid prevFluid = null;
@@ -42,6 +42,10 @@ public class DripperBlockEntity extends BlockEntity {
 			}
 		};
 		fluidCap = LazyOptional.of(() -> tank);
+	}
+
+	public FluidTank getTank() {
+		return tank;
 	}
 
 	public void writeData(CompoundTag tag) {
@@ -88,11 +92,18 @@ public class DripperBlockEntity extends BlockEntity {
 	@NotNull
 	@Override
 	public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-		if (cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
+		if (cap == ForgeCapabilities.FLUID_HANDLER) {
 			return fluidCap.cast();
 		}
 
 		return super.getCapability(cap, side);
+	}
+
+	@Override
+	public void setRemoved() {
+		super.setRemoved();
+
+		fluidCap.invalidate();
 	}
 
 	private void fluidChanged() {
@@ -100,23 +111,23 @@ public class DripperBlockEntity extends BlockEntity {
 
 		if (!level.isClientSide() && prevAmount != tank.getFluidAmount()) {
 			prevAmount = tank.getFluidAmount();
-			level.setBlock(worldPosition, getBlockState().setValue(DripperBlock.ACTIVE, prevAmount > 0), 3);
+			level.setBlock(worldPosition, getBlockState().setValue(DripperBlock.ACTIVE, prevAmount > 0), Block.UPDATE_ALL);
 		}
 
 		if (!level.isClientSide() && prevFluid != tank.getFluid().getFluid()) {
 			prevFluid = tank.getFluid().getFluid();
-			level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 11);
+			level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_ALL_IMMEDIATE);
 		}
 	}
 
-	public void tick(BlockState state, BlockPos posBelow, BlockState blockBelow, Random random) {
+	public void tick(BlockState state, BlockPos posBelow, BlockState blockBelow, RandomSource random) {
 		if (!tank.isEmpty()) {
 			FluidStack fluid = tank.drain(FTBDripper.consumedFluid, IFluidHandler.FluidAction.EXECUTE);
 
 			for (DripRecipe recipe : level.getRecipeManager().getRecipesFor(FTBDripperRecipeSerializers.DRIP_TYPE.get(), NoInventory.INSTANCE, level)) {
-				if (recipe.fluid == fluid.getFluid() && recipe.testInput(blockBelow)) {
-					if (random.nextDouble() < recipe.chance) {
-						level.setBlock(posBelow, recipe.output, 3);
+				if (recipe.getFluid() == fluid.getFluid() && recipe.testInput(blockBelow)) {
+					if (random.nextDouble() < recipe.getChance()) {
+						level.setBlock(posBelow, recipe.getOutputState(), Block.UPDATE_ALL);
 					}
 
 					break;

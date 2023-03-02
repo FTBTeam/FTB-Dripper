@@ -3,10 +3,12 @@ package dev.ftb.mods.ftbdripper.block;
 
 import dev.ftb.mods.ftbdripper.block.entity.DripperBlockEntity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -32,8 +34,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Random;
 
 /**
  * @author LatvianModder
@@ -75,18 +75,15 @@ public class DripperBlock extends Block implements EntityBlock {
 	@Override
 	@Deprecated
 	public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-		if (!level.isClientSide()) {
-			BlockEntity blockEntity = level.getBlockEntity(pos);
+		if (!level.isClientSide() && level.getBlockEntity(pos) instanceof DripperBlockEntity dripper) {
+			FluidTank tank = dripper.getTank();
+			FluidUtil.interactWithFluidHandler(player, hand, tank);
 
-			if (blockEntity instanceof DripperBlockEntity) {
-				FluidTank tank = ((DripperBlockEntity) blockEntity).tank;
-				FluidUtil.interactWithFluidHandler(player, hand, tank);
-
-				if (tank.getFluidAmount() == 0) {
-					player.displayClientMessage(new TextComponent("Empty"), true);
-				} else {
-					player.displayClientMessage(new TextComponent(tank.getFluidAmount() + " / " + tank.getCapacity()).append(" of ").append(tank.getFluid().getDisplayName()), true);
-				}
+			if (tank.getFluidAmount() == 0) {
+				player.displayClientMessage(Component.translatable("ftbdripper.messages.empty"), true);
+			} else {
+				player.displayClientMessage(Component.translatable("ftbdripper.messages.not_empty",
+						tank.getFluidAmount(), tank.getCapacity(), tank.getFluid().getDisplayName()), true);
 			}
 		}
 
@@ -95,13 +92,13 @@ public class DripperBlock extends Block implements EntityBlock {
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void animateTick(BlockState state, Level level, BlockPos pos, Random rand) {
+	public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource rand) {
 		if (state.getValue(ACTIVE)) {
 			BlockEntity entity = level.getBlockEntity(pos);
 			boolean foundParticle = false;
 
-			if (entity instanceof DripperBlockEntity && !((DripperBlockEntity) entity).tank.isEmpty()) {
-				Fluid fluid = ((DripperBlockEntity) entity).tank.getFluid().getFluid();
+			if (entity instanceof DripperBlockEntity dripper && !dripper.getTank().isEmpty()) {
+				Fluid fluid = dripper.getTank().getFluid().getFluid();
 
 				if (fluid != Fluids.EMPTY) {
 					BlockState s = fluid.defaultFluidState().createLegacyBlock();
@@ -121,12 +118,12 @@ public class DripperBlock extends Block implements EntityBlock {
 
 	@Override
 	@Deprecated
-	public void randomTick(BlockState state, ServerLevel level, BlockPos pos, Random random) {
-		BlockPos posBelow = pos;
+	public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+		BlockPos.MutableBlockPos posBelow = pos.mutable();
 		BlockState blockBelow;
 
 		do {
-			posBelow = posBelow.below();
+			posBelow.move(Direction.DOWN);
 
 			if (posBelow.getY() == level.getMinBuildHeight()) {
 				return;
@@ -136,9 +133,8 @@ public class DripperBlock extends Block implements EntityBlock {
 		}
 		while (blockBelow.isAir());
 
-		BlockEntity blockEntity = level.getBlockEntity(pos);
-		if (blockEntity instanceof DripperBlockEntity) {
-			((DripperBlockEntity) blockEntity).tick(state, posBelow, blockBelow, random);
+		if (level.getBlockEntity(pos) instanceof DripperBlockEntity dripper) {
+			dripper.tick(state, posBelow.immutable(), blockBelow, random);
 		}
 	}
 }
