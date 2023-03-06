@@ -44,15 +44,12 @@ public class FTBDripper {
 
 	public void itemRightClick(PlayerInteractEvent.RightClickItem event) {
 		Player player = event.getEntity();
-		if (event.getItemStack().getItem() == Items.BOWL && WaterBowlItem.fillBowl(event.getLevel(), player, event.getHand())) {
+		if (event.getItemStack().getItem() == Items.BOWL && WaterBowlItem.fillBowl(event.getLevel(), player)) {
 			event.getItemStack().shrink(1);
 
 			if (!event.getLevel().isClientSide()) {
 				ItemStack stack = new ItemStack(FTBDripperItems.WATER_BOWL.get());
-				stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(handler -> {
-					handler.fill(new FluidStack(Fluids.WATER, FluidType.BUCKET_VOLUME / 4), IFluidHandler.FluidAction.EXECUTE);
-					ItemHandlerHelper.giveItemToPlayer(player, stack, player.getInventory().selected);
-				});
+				ItemHandlerHelper.giveItemToPlayer(player, stack, player.getInventory().selected);
 			}
 
 			player.swing(event.getHand());
