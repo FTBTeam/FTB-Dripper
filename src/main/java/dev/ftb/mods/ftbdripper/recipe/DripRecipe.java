@@ -1,8 +1,12 @@
 package dev.ftb.mods.ftbdripper.recipe;
 
+import com.google.gson.JsonSyntaxException;
 import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.arguments.blocks.BlockStateParser;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -13,11 +17,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.Fluids;
 
-import java.util.Collections;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author LatvianModder
@@ -25,45 +26,35 @@ import java.util.Objects;
 public class DripRecipe implements Recipe<NoInventory> {
 	private final ResourceLocation id;
 	private final String group;
-	private String inputString;
-	private Block input;
-	private Map<Property<?>, Comparable<?>> inputProperties;
-	public ItemStack inputItem;
-	private String outputString;
-	public BlockState output;
-	public ItemStack outputItem;
-	public Fluid fluid;
-	public double chance;
+	private final String inputString;
+	private final Block inputBlock;
+	private final Map<Property<?>, Comparable<?>> inputProperties;
+	private final String outputString;
+	private final BlockState outputState;
+	private final Fluid fluid;
+	private final double chance;
 
-	public DripRecipe(ResourceLocation i, String g) {
-		id = i;
-		group = g;
-		inputString = "";
-		input = Blocks.AIR;
-		inputProperties = Collections.emptyMap();
-		inputItem = ItemStack.EMPTY;
-		outputString = "";
-		output = Blocks.AIR.defaultBlockState();
-		outputItem = ItemStack.EMPTY;
-		fluid = Fluids.WATER;
-		chance = 1D;
-	}
-
-	public void setInputString(String s) {
-		inputString = s;
+	public DripRecipe(ResourceLocation id, String group, String inputString, String outputString, Fluid fluid, double chance) {
+		this.id = id;
+		this.group = group;
+		this.inputString = inputString;
+		this.outputString = outputString;
+		this.fluid = fluid;
+		this.chance = Mth.clamp(chance, 0.0D, 1.0D);
 
 		try {
-			BlockStateParser parser = new BlockStateParser(new StringReader(inputString), false).parse(false);
-			input = Objects.requireNonNull(parser.getState()).getBlock();
-			inputProperties = parser.getProperties();
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			input = Blocks.AIR;
-			inputProperties = Collections.emptyMap();
+			BlockStateParser.BlockResult blockResult = BlockStateParser.parseForBlock(Registry.BLOCK, new StringReader(inputString), false);
+			inputBlock = blockResult.blockState().getBlock();
+			inputProperties = blockResult.properties();
+		} catch (CommandSyntaxException e) {
+			throw new JsonSyntaxException(e);
 		}
 
-		if (inputItem.isEmpty()) {
-			inputItem = input.asItem().getDefaultInstance();
+		try {
+			BlockStateParser.BlockResult blockResult = BlockStateParser.parseForBlock(Registry.BLOCK, new StringReader(outputString), false);
+			outputState = blockResult.blockState();
+		} catch (CommandSyntaxException e) {
+			throw new JsonSyntaxException(e);
 		}
 	}
 
@@ -71,28 +62,32 @@ public class DripRecipe implements Recipe<NoInventory> {
 		return inputString;
 	}
 
-	public void setOutputString(String s) {
-		outputString = s;
-
-		try {
-			BlockStateParser parser = new BlockStateParser(new StringReader(outputString), false).parse(false);
-			output = Objects.requireNonNull(parser.getState());
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			output = Blocks.AIR.defaultBlockState();
-		}
-
-		if (outputItem.isEmpty()) {
-			outputItem = output.getBlock().asItem().getDefaultInstance();
-		}
-	}
-
 	public String getOutputString() {
 		return outputString;
 	}
 
+	public ItemStack getInputItem() {
+		return inputBlock.asItem().getDefaultInstance();
+	}
+
+	public ItemStack getOutputItem() {
+		return outputState.getBlock().asItem().getDefaultInstance();
+	}
+
+	public BlockState getOutputState() {
+		return outputState;
+	}
+
+	public Fluid getFluid() {
+		return fluid;
+	}
+
+	public double getChance() {
+		return chance;
+	}
+
 	public boolean testInput(BlockState state) {
-		if (input == Blocks.AIR || input != state.getBlock()) {
+		if (inputBlock == Blocks.AIR || inputBlock != state.getBlock()) {
 			return false;
 		}
 

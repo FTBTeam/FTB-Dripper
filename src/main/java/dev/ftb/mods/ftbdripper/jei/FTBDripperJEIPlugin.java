@@ -2,6 +2,7 @@ package dev.ftb.mods.ftbdripper.jei;
 
 import dev.ftb.mods.ftbdripper.FTBDripper;
 import dev.ftb.mods.ftbdripper.item.FTBDripperItems;
+import dev.ftb.mods.ftbdripper.recipe.DripRecipe;
 import dev.ftb.mods.ftbdripper.recipe.FTBDripperRecipeSerializers;
 import dev.ftb.mods.ftbdripper.recipe.NoInventory;
 import mezz.jei.api.IModPlugin;
@@ -13,18 +14,23 @@ import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
+
+import java.util.Objects;
 
 /**
  * @author LatvianModder
  */
 @JeiPlugin
 public class FTBDripperJEIPlugin implements IModPlugin {
-	public static IJeiRuntime RUNTIME;
+	private static final ResourceLocation ID = new ResourceLocation(FTBDripper.MOD_ID, "jei");
+
+	static IJeiRuntime RUNTIME;
 
 	@Override
 	public ResourceLocation getPluginUid() {
-		return new ResourceLocation(FTBDripper.MOD_ID + ":jei");
+		return ID;
 	}
 
 	@Override
@@ -34,13 +40,14 @@ public class FTBDripperJEIPlugin implements IModPlugin {
 
 	@Override
 	public void registerRecipeCatalysts(IRecipeCatalystRegistration r) {
-		r.addRecipeCatalyst(new ItemStack(FTBDripperItems.DRIPPER.get()), DripperCategory.UID);
+		r.addRecipeCatalyst(new ItemStack(FTBDripperItems.DRIPPER.get()), RecipeTypes.DRIP);
 	}
 
 	@Override
 	public void registerRecipes(IRecipeRegistration r) {
-		Level level = Minecraft.getInstance().level;
-		r.addRecipes(level.getRecipeManager().getRecipesFor(FTBDripperRecipeSerializers.DRIP_TYPE.get(), NoInventory.INSTANCE, level), DripperCategory.UID);
+		Level level = Objects.requireNonNull(Minecraft.getInstance().level);
+
+		r.addRecipes(RecipeTypes.DRIP, level.getRecipeManager().getRecipesFor(FTBDripperRecipeSerializers.DRIP_TYPE.get(), NoInventory.INSTANCE, level));
 	}
 
 	@Override

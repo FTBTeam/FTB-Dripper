@@ -17,6 +17,6 @@ public class FTBDripperRecipeSerializers {
 	public static final DeferredRegister<RecipeSerializer<?>> REGISTRY = DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS, FTBDripper.MOD_ID);
 	public static final DeferredRegister<RecipeType<?>> REGISTRY_RECIPE_TYPE = DeferredRegister.create(Registry.RECIPE_TYPE_REGISTRY, FTBDripper.MOD_ID);
 
-	public static final Supplier<RecipeSerializer<?>> DRIP = REGISTRY.register("drip", DripRecipeSerializer::new);
+	public static final RegistryObject<RecipeSerializer<?>> DRIP = REGISTRY.register("drip", DripRecipeSerializer::new);
 	public static final RegistryObject<RecipeType<DripRecipe>> DRIP_TYPE = REGISTRY_RECIPE_TYPE.register("drip", () -> new RecipeType<>() {});
 }
