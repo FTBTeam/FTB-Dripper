@@ -115,7 +115,8 @@ public class DripperBlockEntity extends BlockEntity {
 			FluidStack fluid = tank.drain(FTBDripper.consumedFluid, IFluidHandler.FluidAction.EXECUTE);
 
 			for (DripRecipe recipe : level.getRecipeManager().getRecipesFor(FTBDripperRecipeSerializers.DRIP_TYPE, NoInventory.INSTANCE, level)) {
-				if (recipe.fluid == fluid.getFluid() && recipe.testInput(blockBelow)) {
+				if (((recipe.fluidTag == null && recipe.fluid == fluid.getFluid()) || (recipe.fluidTag != null && fluid.getFluid().is(recipe.fluidTag)))
+						&& recipe.testInput(blockBelow)) {
 					if (random.nextDouble() < recipe.chance) {
 						level.setBlock(posBelow, recipe.output, 3);
 					}

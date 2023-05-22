@@ -17,8 +17,11 @@ import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.fluids.FluidAttributes;
 import net.minecraftforge.fluids.FluidStack;
+
+import java.util.List;
 
 /**
  * @author LatvianModder
@@ -63,7 +66,14 @@ public class DripperCategory implements IRecipeCategory<DripRecipe> {
 	public void setIngredients(DripRecipe recipe, IIngredients ingredients) {
 		ingredients.setOutput(VanillaTypes.ITEM, recipe.outputItem);
 		ingredients.setInput(VanillaTypes.ITEM, recipe.inputItem);
-		ingredients.setInput(VanillaTypes.FLUID, new FluidStack(recipe.fluid, FluidAttributes.BUCKET_VOLUME));
+		if (recipe.fluidTag != null) {
+			List<Fluid> values = recipe.fluidTag.getValues();
+			for (Fluid value : values) {
+				ingredients.setInput(VanillaTypes.FLUID, new FluidStack(value, FluidAttributes.BUCKET_VOLUME));
+			}
+		} else {
+			ingredients.setInput(VanillaTypes.FLUID, new FluidStack(recipe.fluid, FluidAttributes.BUCKET_VOLUME));
+		}
 	}
 
 	@Override

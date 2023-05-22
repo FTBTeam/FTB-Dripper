@@ -3,6 +3,7 @@ package dev.ftb.mods.ftbdripper.recipe;
 import com.mojang.brigadier.StringReader;
 import net.minecraft.commands.arguments.blocks.BlockStateParser;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.Tag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -14,7 +15,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraftforge.common.Tags;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
@@ -33,6 +36,7 @@ public class DripRecipe implements Recipe<NoInventory> {
 	public BlockState output;
 	public ItemStack outputItem;
 	public Fluid fluid;
+	@Nullable public Tags.IOptionalNamedTag<Fluid> fluidTag;
 	public double chance;
 
 	public DripRecipe(ResourceLocation i, String g) {
@@ -47,6 +51,7 @@ public class DripRecipe implements Recipe<NoInventory> {
 		outputItem = ItemStack.EMPTY;
 		fluid = Fluids.WATER;
 		chance = 1D;
+		fluidTag = null;
 	}
 
 	public void setInputString(String s) {

@@ -3,9 +3,13 @@ package dev.ftb.mods.ftbdripper.recipe;
 import com.google.gson.JsonObject;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.tags.Tag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
@@ -45,6 +49,10 @@ public class DripRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?>
 			r.fluid = ForgeRegistries.FLUIDS.getValue(new ResourceLocation(json.get("fluid").getAsString()));
 		}
 
+		if (json.has("fluidTag")) {
+			r.fluidTag = FluidTags.createOptional(new ResourceLocation(json.get("fluidTag").getAsString()));
+		}
+
 		if (json.has("chance")) {
 			r.chance = json.get("chance").getAsDouble();
 		}
@@ -60,6 +68,7 @@ public class DripRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?>
 		r.setOutputString(buffer.readUtf(Short.MAX_VALUE));
 		r.outputItem = buffer.readItem();
 		r.fluid = ForgeRegistries.FLUIDS.getValue(buffer.readResourceLocation());
+		r.fluidTag =  FluidTags.createOptional(buffer.readResourceLocation());
 		r.chance = buffer.readDouble();
 		return r;
 	}
@@ -72,6 +81,7 @@ public class DripRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?>
 		buffer.writeUtf(r.getOutputString(), Short.MAX_VALUE);
 		buffer.writeItem(r.outputItem);
 		buffer.writeResourceLocation(r.fluid.getRegistryName());
+		buffer.writeResourceLocation(r.fluidTag.getName());
 		buffer.writeDouble(r.chance);
 	}
 }
