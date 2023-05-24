@@ -68,7 +68,10 @@ public class DripRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?>
 		r.setOutputString(buffer.readUtf(Short.MAX_VALUE));
 		r.outputItem = buffer.readItem();
 		r.fluid = ForgeRegistries.FLUIDS.getValue(buffer.readResourceLocation());
-		r.fluidTag =  FluidTags.createOptional(buffer.readResourceLocation());
+		ResourceLocation name = buffer.readResourceLocation();
+		if (!name.getPath().equals("empty")) {
+			r.fluidTag = FluidTags.createOptional(name);
+		}
 		r.chance = buffer.readDouble();
 		return r;
 	}
@@ -81,7 +84,11 @@ public class DripRecipeSerializer extends ForgeRegistryEntry<RecipeSerializer<?>
 		buffer.writeUtf(r.getOutputString(), Short.MAX_VALUE);
 		buffer.writeItem(r.outputItem);
 		buffer.writeResourceLocation(r.fluid.getRegistryName());
-		buffer.writeResourceLocation(r.fluidTag.getName());
+		if (r.fluidTag == null) {
+			buffer.writeResourceLocation(new ResourceLocation("minecraft:empty"));
+		} else {
+			buffer.writeResourceLocation(r.fluidTag.getName());
+		}
 		buffer.writeDouble(r.chance);
 	}
 }
